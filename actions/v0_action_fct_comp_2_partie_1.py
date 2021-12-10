@@ -19,15 +19,23 @@ class AppFctComp2Partie1(QDialog):
     def refreshResult(self):
         # TODO 1.2 : fonction à modifier pour remplacer la zone de saisie par une liste de valeurs issues de la BD une fois le fichier ui correspondant mis à jour
         display.refreshLabel(self.ui.label_fct_comp_2, "")
-        if not self.ui.lineEdit_fct_comp_2.text().strip():
+        if not self.ui.comboBox.currentText().strip():
             self.ui.table_fct_comp_2.setRowCount(0)
             display.refreshLabel(self.ui.label_fct_comp_2, "Veuillez indiquer un nom de catégorie")
+            try:
+                cursor = self.data.cursor()
+                result2 = cursor.execute("SELECT distinct catZone FROM V0_LesPlaces")
+            except Exception as e:
+                self.ui.table_fct_comp_1.setRowCount(0)
+                display.refreshLabel(self.ui.label_fct_comp_1, "Impossible d'afficher les résultats : " + repr(e))
+            else:
+                display.refreshGenericCombo(self.ui.comboBox, result2)
         else:
             try:
                 cursor = self.data.cursor()
                 result = cursor.execute(
                     "SELECT noPlace, noRang, noZone FROM V0_LesPlaces WHERE catZone = ?",
-                    [self.ui.lineEdit_fct_comp_2.text().strip()])
+                    [self.ui.comboBox.currentText().strip()])
             except Exception as e:
                 self.ui.table_fct_comp_2.setRowCount(0)
                 display.refreshLabel(self.ui.label_fct_comp_2, "Impossible d'afficher les résultats : " + repr(e))
